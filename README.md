@@ -115,13 +115,32 @@ Expected response:
 
 #### Setup Test Environment
 
-```bash
-# Create Python virtual environment (recommended)
-python3 -m venv test-env
-source test-env/bin/activate  # On Windows: test-env\Scripts\activate
+**Step 1: Create Virtual Environment**
 
-# Install test dependencies
+```bash
+# Create Python virtual environment
+python3 -m venv test-env
+
+# Activate virtual environment
+# On macOS/Linux:
+source test-env/bin/activate
+
+# On Windows:
+# test-env\Scripts\activate
+```
+
+**Step 2: Install Dependencies**
+
+```bash
+# Install test dependencies (ensure virtual environment is activated)
 pip install -r tests/requirements.txt
+```
+
+**Step 3: Verify Setup**
+
+```bash
+# Verify requests library is installed
+python -c "import requests; print('Dependencies installed successfully!')"
 ```
 
 #### Run Tests
