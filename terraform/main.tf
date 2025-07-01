@@ -1,3 +1,7 @@
+data "aws_availability_zones" "available" {
+  state = "available" # Only get available zones
+}
+
 terraform {
   required_version = ">= 1.0"
   required_providers {
@@ -11,15 +15,13 @@ terraform {
     }
   }
 }
-
 provider "aws" {
   region = var.aws_region
-
   default_tags {
     tags = {
-      Project     = "iac-assignment"
-      Environment = "dev"
-      ManagedBy   = "terraform"
+      ManagedBy   = "Terraform"
+      Project     = var.prefix + "-iac-assignment"
+      Environment = "Dev"
     }
   }
 }
