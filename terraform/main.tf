@@ -20,7 +20,7 @@ provider "aws" {
   default_tags {
     tags = {
       ManagedBy   = "Terraform"
-      Project     = var.prefix + "-iac-assignment"
+      Project     = "${var.prefix}-${var.project_name}"
       Environment = "Dev"
     }
   }

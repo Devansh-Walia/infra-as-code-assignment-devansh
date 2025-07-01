@@ -10,6 +10,12 @@ variable "aws_region" {
   default     = "eu-central-1"
 }
 
+variable "project_name" {
+  description = "Name of the project for resource naming"
+  type        = string
+  default     = "iac-assignment"
+}
+
 variable "environment" {
   description = "Environment name"
   type        = string
