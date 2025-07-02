@@ -1,3 +1,16 @@
+locals {
+  api_routes = {
+    register = {
+      route_key  = "PUT /register"
+      lambda_key = "register-user"
+    }
+    verify = {
+      route_key  = "GET /"
+      lambda_key = "verify-user"
+    }
+  }
+}
+
 # API Gateway HTTP API
 resource "aws_apigatewayv2_api" "main" {
   name          = "${var.prefix}-${var.project_name}-api"
@@ -18,18 +31,22 @@ resource "aws_apigatewayv2_api" "main" {
   }
 }
 
-# API Gateway route for root path
-resource "aws_apigatewayv2_route" "root" {
+# API Gateway routes
+resource "aws_apigatewayv2_route" "routes" {
+  for_each = local.api_routes
+
   api_id    = aws_apigatewayv2_api.main.id
-  route_key = "GET /"
-  target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
+  route_key = each.value.route_key
+  target    = "integrations/${aws_apigatewayv2_integration.lambda_integrations[each.key].id}"
 }
 
-# API Gateway integration with Lambda
-resource "aws_apigatewayv2_integration" "lambda_integration" {
+# API Gateway integrations with Lambda functions
+resource "aws_apigatewayv2_integration" "lambda_integrations" {
+  for_each = local.api_routes
+
   api_id           = aws_apigatewayv2_api.main.id
   integration_type = "AWS_PROXY"
-  integration_uri  = aws_lambda_function.hello_world.invoke_arn
+  integration_uri  = aws_lambda_function.functions[each.value.lambda_key].invoke_arn
 
   integration_method     = "POST"
   payload_format_version = "2.0"
@@ -40,8 +57,8 @@ resource "aws_apigatewayv2_deployment" "main" {
   api_id = aws_apigatewayv2_api.main.id
 
   depends_on = [
-    aws_apigatewayv2_route.root,
-    aws_apigatewayv2_integration.lambda_integration,
+    aws_apigatewayv2_route.routes,
+    aws_apigatewayv2_integration.lambda_integrations,
   ]
 
   lifecycle {
