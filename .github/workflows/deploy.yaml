@@ -33,8 +33,7 @@ permissions:
   pull-requests: write
 
 env:
-  AWS_REGION: eu-central-1
-  TF_VERSION: 1.5.0
+  TF_VERSION: 1.12.2
 
 jobs:
   terraform-checks:
