@@ -8,7 +8,7 @@ locals {
       handler     = "register_user.lambda_handler"
       description = "Register new users in DynamoDB"
       environment_vars = {
-        DB_TABLE_NAME = aws_dynamodb_table.users.name
+        DB_TABLE_NAME = module.user_storage.dynamodb_table_name
       }
       iam_policies = [
         {
@@ -16,7 +16,7 @@ locals {
           actions = [
             "dynamodb:PutItem"
           ]
-          resources = [aws_dynamodb_table.users.arn]
+          resources = [module.user_storage.dynamodb_table_arn]
         }
       ]
     }
@@ -25,8 +25,8 @@ locals {
       handler     = "verify_user.lambda_handler"
       description = "Verify users and return HTML from S3"
       environment_vars = {
-        DB_TABLE_NAME = aws_dynamodb_table.users.name
-        WEBSITE_S3    = module.s3_bucket.s3_bucket_id
+        DB_TABLE_NAME = module.user_storage.dynamodb_table_name
+        WEBSITE_S3    = module.user_storage.s3_bucket_id
       }
       iam_policies = [
         {
@@ -34,14 +34,14 @@ locals {
           actions = [
             "dynamodb:GetItem"
           ]
-          resources = [aws_dynamodb_table.users.arn]
+          resources = [module.user_storage.dynamodb_table_arn]
         },
         {
           effect = "Allow"
           actions = [
             "s3:GetObject"
           ]
-          resources = ["${module.s3_bucket.s3_bucket_arn}/*"]
+          resources = ["${module.user_storage.s3_bucket_arn}/*"]
         }
       ]
     }
@@ -56,7 +56,7 @@ module "lambda_functions" {
   project_name              = var.project_name
   aws_region                = var.aws_region
   functions                 = local.lambda_functions
-  api_gateway_execution_arn = aws_apigatewayv2_api.main.execution_arn
+  api_gateway_execution_arn = module.api_gateway.api_gateway_execution_arn
 
   # Optional configurations
   runtime            = "python3.9"

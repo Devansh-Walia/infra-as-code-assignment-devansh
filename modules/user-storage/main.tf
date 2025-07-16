@@ -84,13 +84,8 @@ resource "aws_dynamodb_table" "users" {
   }
 
   # Stream configuration
-  dynamic "stream_specification" {
-    for_each = var.stream_enabled ? [1] : []
-    content {
-      stream_enabled   = true
-      stream_view_type = var.stream_view_type
-    }
-  }
+  stream_enabled   = var.stream_enabled
+  stream_view_type = var.stream_enabled ? var.stream_view_type : null
 
   tags = merge(var.common_tags, {
     Name    = "${var.prefix}-${var.project_name}-${var.table_name}"
