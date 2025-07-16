@@ -1,4 +1,4 @@
-# Infrastructure as Code Assignment - Milestone 2
+# Infrastructure as Code Assignment - Milestone 3
 
 ## Overview
 
