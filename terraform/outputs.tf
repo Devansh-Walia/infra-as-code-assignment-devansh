@@ -25,14 +25,10 @@ output "dynamodb_table_name" {
 
 output "lambda_function_names" {
   description = "Names of the Lambda functions"
-  value = {
-    for key, func in aws_lambda_function.functions : key => func.function_name
-  }
+  value       = module.lambda_functions.function_names
 }
 
 output "lambda_function_arns" {
   description = "ARNs of the Lambda functions"
-  value = {
-    for key, func in aws_lambda_function.functions : key => func.arn
-  }
+  value       = module.lambda_functions.function_arns
 }

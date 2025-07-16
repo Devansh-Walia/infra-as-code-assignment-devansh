@@ -1,3 +1,6 @@
+# Lambda Functions Module
+# This replaces the previous inline Lambda function resources with a reusable module
+
 locals {
   lambda_functions = {
     register-user = {
@@ -7,6 +10,15 @@ locals {
       environment_vars = {
         DB_TABLE_NAME = aws_dynamodb_table.users.name
       }
+      iam_policies = [
+        {
+          effect = "Allow"
+          actions = [
+            "dynamodb:PutItem"
+          ]
+          resources = [aws_dynamodb_table.users.arn]
+        }
+      ]
     }
     verify-user = {
       source_file = "${path.module}/../src/verify_user.py"
@@ -16,55 +28,45 @@ locals {
         DB_TABLE_NAME = aws_dynamodb_table.users.name
         WEBSITE_S3    = module.s3_bucket.s3_bucket_id
       }
+      iam_policies = [
+        {
+          effect = "Allow"
+          actions = [
+            "dynamodb:GetItem"
+          ]
+          resources = [aws_dynamodb_table.users.arn]
+        },
+        {
+          effect = "Allow"
+          actions = [
+            "s3:GetObject"
+          ]
+          resources = ["${module.s3_bucket.s3_bucket_arn}/*"]
+        }
+      ]
     }
   }
 }
 
-# Create zip files for each Lambda function
-data "archive_file" "lambda_zip" {
-  for_each = local.lambda_functions
+# Lambda Functions Module
+module "lambda_functions" {
+  source = "../modules/lambda-function"
 
-  type        = "zip"
-  source_file = each.value.source_file
-  output_path = "${path.module}/${each.key}_lambda.zip"
-}
+  prefix                    = var.prefix
+  project_name              = var.project_name
+  aws_region                = var.aws_region
+  functions                 = local.lambda_functions
+  api_gateway_execution_arn = aws_apigatewayv2_api.main.execution_arn
 
-# CloudWatch Log Groups for Lambda functions
-resource "aws_cloudwatch_log_group" "lambda_logs" {
-  for_each = local.lambda_functions
+  # Optional configurations
+  runtime            = "python3.9"
+  timeout            = 30
+  memory_size        = 128
+  log_retention_days = 14
 
-  name              = "/aws/lambda/${var.prefix}-${var.project_name}-${each.key}"
-  retention_in_days = 14
-
-  tags = {
-    Name = "${var.prefix}-${var.project_name}-${each.key}-logs"
-  }
-}
-
-# Lambda functions
-resource "aws_lambda_function" "functions" {
-  for_each = local.lambda_functions
-
-  filename      = data.archive_file.lambda_zip[each.key].output_path
-  function_name = "${var.prefix}-${var.project_name}-${each.key}"
-  role          = aws_iam_role.lambda_execution_role[each.key].arn
-  handler       = each.value.handler
-  runtime       = "python3.9"
-  timeout       = 30
-  description   = each.value.description
-
-  source_code_hash = data.archive_file.lambda_zip[each.key].output_base64sha256
-
-  environment {
-    variables = each.value.environment_vars
-  }
-
-  depends_on = [
-    aws_iam_role_policy_attachment.lambda_policies,
-    aws_cloudwatch_log_group.lambda_logs,
-  ]
-
-  tags = {
-    Name = "${var.prefix}-${var.project_name}-${each.key}"
+  common_tags = {
+    Environment = var.environment
+    Project     = "${var.prefix}-${var.project_name}"
+    ManagedBy   = "terraform"
   }
 }

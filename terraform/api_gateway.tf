@@ -46,7 +46,7 @@ resource "aws_apigatewayv2_integration" "lambda_integrations" {
 
   api_id           = aws_apigatewayv2_api.main.id
   integration_type = "AWS_PROXY"
-  integration_uri  = aws_lambda_function.functions[each.value.lambda_key].invoke_arn
+  integration_uri  = module.lambda_functions.function_invoke_arns[each.value.lambda_key]
 
   integration_method     = "POST"
   payload_format_version = "2.0"
