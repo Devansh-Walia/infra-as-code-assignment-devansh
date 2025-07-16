@@ -1,7 +1,3 @@
-data "aws_availability_zones" "available" {
-  state = "available" # Only get available zones
-}
-
 terraform {
   required_version = ">= 1.0"
   required_providers {
