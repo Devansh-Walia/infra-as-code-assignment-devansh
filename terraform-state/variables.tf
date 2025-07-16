@@ -4,6 +4,12 @@ variable "prefix" {
   default     = "deva"
 }
 
+variable "project_name" {
+  description = "Name of the project"
+  type        = string
+  default     = "iac-assignment"
+}
+
 variable "aws_region" {
   description = "AWS region for resources"
   type        = string

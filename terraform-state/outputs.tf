@@ -22,3 +22,14 @@ output "aws_region" {
   description = "AWS region where resources are created"
   value       = var.aws_region
 }
+
+# GitHub OIDC outputs
+output "github_actions_role_arn" {
+  description = "ARN of the GitHub Actions IAM role"
+  value       = aws_iam_role.github_actions.arn
+}
+
+output "github_oidc_provider_arn" {
+  description = "ARN of the GitHub OIDC provider"
+  value       = data.aws_iam_openid_connect_provider.github_actions.arn
+}
