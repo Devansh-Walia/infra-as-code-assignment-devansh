@@ -7,7 +7,6 @@ terraform {
     region         = "eu-central-1"
     dynamodb_table = "deva-terraform-locks"
 
-    encrypt      = true
-    use_lockfile = true
+    encrypt = true
   }
 }
