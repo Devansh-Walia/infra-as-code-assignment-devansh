@@ -137,7 +137,7 @@ jobs:
         working-directory: terraform
 
       - name: Terraform Plan
-        run: terraform plan -var-file="data.tf_vars" -out=tfplan
+        run: terraform plan -var-file="data.tfvars" -out=tfplan
         working-directory: terraform
 
       - name: Upload Terraform Plan
@@ -172,7 +172,7 @@ jobs:
         working-directory: terraform
 
       - name: Terraform Apply
-        run: terraform apply -var-file="data.tf_vars" -auto-approve
+        run: terraform apply -var-file="data.tfvars" -auto-approve
         working-directory: terraform
 
       - name: Get API Gateway URL
@@ -216,5 +216,5 @@ jobs:
         working-directory: terraform
 
       - name: Terraform Destroy
-        run: terraform destroy -var-file="data.tf_vars" -auto-approve
+        run: terraform destroy -var-file="data.tfvars" -auto-approve
         working-directory: terraform
